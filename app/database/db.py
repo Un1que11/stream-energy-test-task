@@ -3,6 +3,7 @@ from sqlmodel import SQLModel, Session, create_engine
 from app import crud
 from app.config import settings
 from app.models.user.user_model import *
+from app.models.note.note_model import *
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
