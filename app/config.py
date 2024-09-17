@@ -1,5 +1,3 @@
-import os
-
 from pydantic import (
     PostgresDsn,
     computed_field,
@@ -12,12 +10,13 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env", env_ignore_empty=True, extra="ignore"
     )
-    PROJECT_NAME = "stream-energy-test-task"
-    POSTGRES_SERVER = os.getenv('POSTGRES_SERVER')
-    POSTGRES_PORT = os.getenv('POSTGRES_PORT')
-    POSTGRES_DB = os.getenv('POSTGRES_DB')
-    POSTGRES_USER = os.getenv('POSTGRES_USER')
-    POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+    version: str
+    PROJECT_NAME: str
+    POSTGRES_SERVER: str = '0.0.0.0'
+    POSTGRES_PORT: int = 5433
+    POSTGRES_DB: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
     
     @computed_field
     @property
@@ -26,8 +25,8 @@ class Settings(BaseSettings):
             scheme="postgresql+asyncpg",
             username=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
-            host=self.POSTGRES_SERVER,
-            port=self.POSTGRES_PORT,
+            host='0.0.0.0',
+            port=5433,
             path=self.POSTGRES_DB,
         )
 

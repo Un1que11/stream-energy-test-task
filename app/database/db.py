@@ -1,16 +1,26 @@
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
+from fastapi import Depends
 
-from app import crud
+from collections.abc import AsyncGenerator
+from typing import Annotated
+
 from app.config import settings
-from app.models.user.user_model import *
-from app.models.note.note_model import *
+from app.models import *
 
-engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+async_engine = create_async_engine(
+    str(settings.SQLALCHEMY_DATABASE_URI),
+    echo=True,
+    future=True
+)
 
 
-def init_db(session: Session) -> None:
-    # Tables should be created with Alembic migrations
-    # But to speed up proccess I decided to create tables by the following approach
+async def get_async_session() -> AsyncGenerator[AsyncSession, None, None]:
+    async_session = sessionmaker(
+        bind=async_engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
+        yield session
 
-    # This works because the models are already imported and registered from app.models
-    SQLModel.metadata.create_all(engine)
+SessionDep = Annotated[AsyncSession, Depends(get_async_session)]

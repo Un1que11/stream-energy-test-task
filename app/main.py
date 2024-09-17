@@ -5,20 +5,15 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.common.error import BadRequest, UnprocessableError, UnauthorizatedError
-from app.config import Config
-from app.common.startup import startup
-from app.common.shutdown import shutdown
-from app.api import admin, users, events
+from app.config import settings
+from app.api import users
 
 app = FastAPI()
-
-app.add_event_handler("startup", startup)
-app.add_event_handler("shutdown", shutdown)
 
 # Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # TODO: Set frontend domain in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,8 +24,8 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title=Config.title,
-        version=Config.version,
+        title=settings.PROJECT_NAME,
+        version=settings.version,
         routes=app.routes
     )
     app.openapi_schema = openapi_schema
